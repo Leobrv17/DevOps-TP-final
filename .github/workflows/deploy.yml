@@ -8,6 +8,7 @@ env:
   JWT_SECRET: "your_secret"
   BCRYPT_SALT_ROUNDS: 10
   VITE_API_URL : http://back:3000
+  BACK_CONTAINER_NAME : back
 
 
 jobs:
