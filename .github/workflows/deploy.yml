@@ -9,31 +9,33 @@ env:
   BCRYPT_SALT_ROUNDS: 10
   VITE_API_URL : http://back:3000
 
-build-back:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - uses: docker/login-action@v3
-      with:
-        username: nologin
-        password: ${{ secrets.SCALEWAY_API_KEY }}
-        registry: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}
-    - name: Build backend
-      run : |
-        docker build -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/$BACK_CONTAINER_NAME --no-cache \
-        --build-arg DATABASE_URL=$DATABASE_URL \
-        --build-arg JWT_SECRET=$JWT_SECRET \
-        --build-arg BCRYPT_SALT_ROUNDS=$BCRYPT_SALT_ROUNDS ./back/
-    - name: Push backend
-      run: |
-        docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/$BACK_CONTAINER_NAME
-  
 
-  stop-back:
+jobs:
+  build-back:
     runs-on: ubuntu-latest
-    needs: [ build-backend ]
     steps:
-      - name: Stop backend
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v3
+        with:
+          username: nologin
+          password: ${{ secrets.SCALEWAY_API_KEY }}
+          registry: ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}
+      - name: Build backend
         run: |
-          docker stop $BACK_CONTAINER_NAME || true
-          docker rm $BACK_CONTAINER_NAME || true
+          docker build -t ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/$BACK_CONTAINER_NAME --no-cache \
+          --build-arg DATABASE_URL=$DATABASE_URL \
+          --build-arg JWT_SECRET=$JWT_SECRET \
+          --build-arg BCRYPT_SALT_ROUNDS=$BCRYPT_SALT_ROUNDS ./back/
+      - name: Push backend
+        run: |
+          docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/$BACK_CONTAINER_NAME
+
+
+    stop-back:
+      runs-on: ubuntu-latest
+      needs: [ build-backend ]
+      steps:
+        - name: Stop backend
+          run: |
+            docker stop $BACK_CONTAINER_NAME || true
+            docker rm $BACK_CONTAINER_NAME || true
