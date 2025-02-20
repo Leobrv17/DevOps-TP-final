@@ -29,13 +29,11 @@ jobs:
       - name: Push backend
         run: |
           docker push ${{ secrets.CONTAINER_REGISTRY_ENDPOINT }}/$BACK_CONTAINER_NAME
-
-
-    stop-back:
-      runs-on: ubuntu-latest
-      needs: [ build-backend ]
-      steps:
-        - name: Stop backend
-          run: |
-            docker stop $BACK_CONTAINER_NAME || true
-            docker rm $BACK_CONTAINER_NAME || true
+  stop-back:
+    runs-on: ubuntu-latest
+    needs: [ build-backend ]
+    steps:
+      - name: Stop backend
+        run: |
+          docker stop $BACK_CONTAINER_NAME || true
+          docker rm $BACK_CONTAINER_NAME || true
